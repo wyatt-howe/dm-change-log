@@ -14,22 +14,22 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/segmentio/kafka-go"
 
-	"github.com/carbondmp/dm-change-log/model"
+	"github.com/wyatt-howe/dm-change-log/model"
 )
 
 func TestIntegration(t *testing.T) {
 	fatal := fatalFactory(t)
 
 	testChangeEvent := model.ChangeEvent{
-		ID:                 ulid.Make(),
-		EventTime:          time.Now().Unix(),
+		ID:              ulid.Make(),
+		EventTime:       time.Now().Unix(),
 		EventObjectID:   ulid.Make().String(),
 		EventObjectType: "soul",
-		EffectedService:    "valhalla",
-		SourceService:      "battle",
-		User:               "thor",
-		Reason:             "bordem",
-		EventType:          "create",
+		EffectedService: "valhalla",
+		SourceService:   "battle",
+		User:            "thor",
+		Reason:          "bordem",
+		EventType:       "create",
 	}
 
 	{

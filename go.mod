@@ -1,4 +1,4 @@
-module github.com/carbondmp/dm-change-log
+module github.com/wyatt-howe/dm-change-log
 
 go 1.22
 

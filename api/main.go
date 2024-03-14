@@ -12,8 +12,8 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/spf13/viper"
 
+	"github.com/carbondmp/dm-change-log/model"
 	"github.com/carbondmp/initialize"
-	"github.com/wyatt-howe/dm-change-log/model"
 )
 
 const (

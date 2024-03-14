@@ -11,7 +11,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"github.com/spf13/viper"
 
-	"github.com/wyatt-howe/dm-change-log/model"
+	"github.com/carbondmp/dm-change-log/model"
 )
 
 const (

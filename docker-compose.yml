@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build: { target: api, context: ., args: [ "GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN:-}" ]}
+    ports: [ 12345:12345 ]
+    environment: {DB_MAIN: "root:q1w2e3r4@tcp(mysql:3306)/app?parseTime=true"}
+    depends_on: { mysql: { condition: service_healthy } }
+  emitter:
+    build: { target: emitter, context: ., args: [ "GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN:-}" ] }
+    ports: [ 54321:54321 ]
+    environment: { KAFKA_BROKERS: kafka_broker:29092 }
+    depends_on: { kafka_broker: { condition: service_healthy } }
+  consumer:
+    build: { target: consumer, context: ., args: [ "GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN:-}" ] }
+    environment: 
+      KAFKA_BROKERS: kafka_broker:29092
+      API_ROOT: http://api:12345/change-log/v1
+    depends_on: { emitter: { condition: service_healthy } }
+  mysql:
+    image: mysql:8.0
+    #ports: [ 3306 ]
+    environment: { MYSQL_DATABASE: app, MYSQL_ROOT_PASSWORD: 'q1w2e3r4' }
+    volumes: [ ./sql:/docker-entrypoint-initdb.d:ro ]
+    healthcheck: { test: mysql -uroot -p$$MYSQL_ROOT_PASSWORD -e "SELECT 1" $$MYSQL_DATABASE, interval: 2s, timeout: 1s, retries: 30 }
+  kafka_broker:
+    image: 745821988602.dkr.ecr.us-east-1.amazonaws.com/docker-kafka:0.0.2
+    #ports:
+      #- 9092:9092 # external
+      #- 29092 # internal
+    hostname: kafka_broker
+    healthcheck:
+      test: [ "CMD", "bin/kafka-topics.sh", "--bootstrap-server", "kafka_broker:9092", "--list" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+  kafka_init_topic:
+    image: 745821988602.dkr.ecr.us-east-1.amazonaws.com/docker-kafka:0.0.2
+    entrypoint: "/kafka_2.13-3.3.1/bin/kafka-topics.sh --create --topic dm-change-log --if-not-exists --bootstrap-server kafka_broker:29092"
+    restart: 'no'

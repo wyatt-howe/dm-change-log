@@ -1,0 +1,5 @@
+{
+    "port": 54321,
+    "kafka_brokers": ["localhost:9092"],
+    "kafka_topic": "dm-change-log"
+}

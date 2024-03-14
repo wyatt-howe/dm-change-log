@@ -1,0 +1,64 @@
+before:
+  hooks:
+    - go mod download -x
+builds:
+  - binary: main
+    env:
+      - CGO_ENABLED=0
+      - GOPRIVATE=github:com/brideclick/*,github:com/carbondmp/*
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    #ldflags:
+    #  - -s -w -X main.version={{.Version}} -X main.buildCommit={{.Commit}} -X main.buildDate={{.Date}} -X main.buildBy=goreleaser
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+dockers:
+  - image_templates:
+      - "{{.Env.ECR_REPOSITORY}}/{{.ProjectName}}/emitter:{{.Version}}-amd64"
+    use: buildx
+    dockerfile: ../docker/release/Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    extra_files:
+      - config/dev.json
+      - config/test.json
+      - config/stg.json
+      - config/prod.json
+  - image_templates:
+      - "{{.Env.ECR_REPOSITORY}}/{{.ProjectName}}/emitter:{{.Version}}-arm64v8"
+    use: buildx
+    goarch: arm64
+    dockerfile: ../docker/release/Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+    extra_files:
+      - config/dev.json
+      - config/test.json
+      - config/stg.json
+      - config/prod.json
+docker_manifests:
+  - name_template: "{{.Env.ECR_REPOSITORY}}/{{.ProjectName}}/emitter:{{.Version}}"
+    image_templates:
+      - "{{.Env.ECR_REPOSITORY}}/{{.ProjectName}}/emitter:{{.Version}}-amd64"
+      - "{{.Env.ECR_REPOSITORY}}/{{.ProjectName}}/emitter:{{.Version}}-arm64v8"
+release:
+  skip_upload: true

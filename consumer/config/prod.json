@@ -1,0 +1,6 @@
+{
+    "api_root": "http://localhost:12345/change-log/v1",
+    "kafka_brokers": ["localhost:9092"],
+    "kafka_topic": "dm-change-log",
+    "kafka_group_id": "dm-change-log-api-worker"
+}

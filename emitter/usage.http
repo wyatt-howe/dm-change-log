@@ -1,0 +1,26 @@
+@api = http://localhost:54321/change-log/v1/emitter
+
+@test_event_id = 19d87842-0c8d-460b-9dfd-82265fd66647
+
+###
+GET {{api}}/accessible
+###
+POST {{api}}/change-events
+Content-Type: application/json
+
+{
+    "id": "{{test_event_id}}",
+    "id": "{{$guid}}",
+    "event_time": {{$timestamp}},
+    "event_object_id": "{{$guid}}",
+    "event_object_type": "taxonomy_record",
+    "effected_service": "data_catalogue",
+    "source_service": "data_mart_ui",
+    "correlation_id": "",
+    "user": "bob",
+    "reason": "malice",
+    "comment": "",
+    "event_type": "create",
+    "before_object": null,
+    "after_object": null
+}
